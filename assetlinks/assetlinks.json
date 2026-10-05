@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.netlify.inspiring_beijinho_79cb7c.twa",
+        "sha256_cert_fingerprints": ["23:FF:0D:21:30:0A:0A:DF:2D:18:EB:EB:52:75:F0:1C:B8:9C:0B:1F:F5:2D:10:CB:06:D6:12:7C:81:6A:60:63"]
+      }
+    }]

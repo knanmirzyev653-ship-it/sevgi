@@ -1,18 +1,87 @@
 <!DOCTYPE html>
 <html lang="az">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sevgi</title>
-</head>
-<body style="margin:0; text-align:center;">
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGMZGZ0K06"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  <img src="fidan.jpg" style="width:100%;height:auto;">
+  gtag('config', 'G-HGMZGZ0K06');
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+  <title>Brauzer</title>
+  </head>
 
-  <audio controls autoplay>
-    <source src="mahni.mp3" type="audio/mpeg">
-  </audio>
+<body>
+  <div id="tabs"></div>
+  <div id="bar">
+    <button id="back" title="Geri">←</button>
+    <button id="fwd" title="İrəli">→</button>
+    <button id="home-b" title="Ana səhifə">⌂</button>
+    <input id="url" placeholder="Axtarın və ya ünvan yazın" autocomplete="off" spellcheck="false">
+    <button id="ext" title="Yeni pəncərədə aç">↗</button>
+  </div>
+  <div id="view"></div>
+  <script>
+    var tabs = [], cur = 0, uid = 0;
+    var links = [["Google", "https://www.google.com/search?igu=1"], ["Wikipedia", "https://az.wikipedia.org"], ["YouTube", "https://www.youtube.com"], ["Gmail", "https://mail.google.com"], ["Maps", "https://maps.google.com"], ["Xəbərlər", "https://news.google.com"] [""]];
+    function el(id) { return document.getElementById(id) }
+    function norm(s) {
+      s = s.trim(); if (!s) return "";
+      if (/^https?:\/\//i.test(s)) return s;
+      if (/^[\w-]+(\.[\w-]+)+(\/.*)?$/.test(s)) return "https://" + s;
+      return "https://www.google.com/search?igu=1&q=" + encodeURIComponent(s)
+    }
+    function newTab(u) { tabs.push({ id: ++uid, url: u || "", hist: u ? [u] : [], i: u ? 0 : -1 }); cur = tabs.length - 1; render() }
+    function go(u, push) {
+      var t = tabs[cur]; if (!u) { t.url = ""; t.i = -1; t.hist = []; render(); return }
+      if (push !== false) { t.hist = t.hist.slice(0, t.i + 1); t.hist.push(u); t.i = t.hist.length - 1 }
+      t.url = u; render()
+    }
+    function title(t) { if (!t.url) return "Yeni sekme"; try { return new URL(t.url).hostname.replace("www.", "") } catch (e) { return t.url } }
+    function render() {
+      var T = el("tabs"); T.innerHTML = "";
+      tabs.forEach(function (t, k) {
+        var d = document.createElement("div"); d.className = "tab" + (k === cur ? " on" : "");
+        d.innerHTML = "<span></span><b>×</b>"; d.firstChild.textContent = title(t);
+        d.onclick = function () { cur = k; render() };
+        d.lastChild.onclick = function (e) { e.stopPropagation(); tabs.splice(k, 1); if (!tabs.length) { newTab(); return } cur = Math.min(cur, tabs.length - 1); render() };
+        T.appendChild(d)
+      });
+      var p = document.createElement("button"); p.id = "plus"; p.textContent = "+"; p.onclick = function () { newTab() }; T.appendChild(p);
+      var t = tabs[cur], V = el("view"); el("url").value = t.url; V.innerHTML = ""; V.className = t.url ? "" : "home";
+      if (!t.url) {
+        V.innerHTML = '<div id="home"><h1>Brauzer</h1><input id="q" placeholder="Google-da axtarın və ya ünvan yazın" autocomplete="off"><div id="links"></div></div>';
+        var L = el("links"); links.forEach(function (l) { var a = document.createElement("a"); a.innerHTML = "<i>" + l[0][0] + "</i>" + l[0]; a.onclick = function () { go(l[1]) }; L.appendChild(a) });
+        el("q").onkeydown = function (e) { if (e.key === "Enter") go(norm(this.value)) };
+      } else {
+        var f = document.createElement("iframe"); f.src = t.url; f.setAttribute("referrerpolicy", "no-referrer"); V.appendChild(f);
+        var n = document.createElement("div"); n.id = "note"; n.style.display = "block";
+        n.innerHTML = 'Səhifə boş görünürsə, bu sayt çərçivədə açılmağa icazə vermir. <a id="nt">Yeni vərəqdə aç</a>';
+        V.appendChild(n); el("nt").onclick = function () { window.open(t.url, "_blank", "noopener") };
+        setTimeout(function () { if (n.parentNode) n.style.display = "none" }, 9000);
+      }
+    }
+    el("url").onkeydown = function (e) { if (e.key === "Enter") { var u = norm(this.value); go(u) } };
+    el("url").onfocus = function () { this.select() };
+    el("back").onclick = function () { var t = tabs[cur]; if (t.i > 0) { t.i--; go(t.hist[t.i], false) } else if (t.i === 0) { go("") } };
+    el("fwd").onclick = function () { var t = tabs[cur]; if (t.i < t.hist.length - 1) { t.i++; go(t.hist[t.i], false) } };
+    el("home-b").onclick = function () { go("") };
+    el("ext").onclick = function () { var u = tabs[cur].url; if (u) window.open(u, "_blank", "noopener") };
+    newTab();
+  </script>
+    <script data-goatcounter="https://brauzerim.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
 
+  <script>
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+  </script>
+   
 </body>
 </html>
-
